@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.font import Font
 from PIL import ImageTk, Image
 import time
 import math
@@ -10,6 +11,8 @@ racine= Tk()
 canvas = Canvas(racine, width=600, height=600) #Définit les dimensions du canvas
 racine.configure(background='grey')
 canvas.configure(background='grey')
+font = Font(family='Liberation Serif', size = 16)
+
 canvas.create_oval(5, 5, 600, 600, outline="#9EFD38", fill="#18391E", width=2)
 canvas.create_oval(55, 55, 550, 550, outline="#9EFD38", fill="#18391E", width=2)
 canvas.create_oval(105, 105, 500, 500, outline="#9EFD38", fill="#18391E", width=2)
@@ -21,6 +24,9 @@ canvas.create_line(300, 0, 300, 600, fill="#9EFD38", width=1)
 canvas.create_line(0, 300, 600, 300, fill="#9EFD38", width=1)
 canvas.create_line(90, 90, 510, 510, fill="#9EFD38", width=1)
 canvas.create_line(510, 90, 90, 510, fill="#9EFD38", width=1)
+
+canvas.create_text(40, 575, text = "Angle: ", font=font, anchor="w")
+canvas.create_text(500, 575, text = "Distance: ", font=font, anchor="w")
 canvas.pack() #Affiche le canvas
 
 R = 300
@@ -29,6 +35,9 @@ centreY = R
 id_line = []
 id_point = []
 id_tmp = []
+id_angle = []
+id_dist = []
+idDstAng = 0
 remove = False
 remove2 = False
 delete = 0
@@ -50,7 +59,7 @@ print(timeBoucle)
 bouton_sortir = Button(racine,text="Sortir",command=racine.destroy)
 bouton_sortir.pack()
 
-ser = serial.Serial('COM5')
+ser = serial.Serial('/dev/tty.usbserial')
 while True:
         buffern1 = ser.read(2)
         count = int(len(buffern1)/2)
@@ -64,6 +73,16 @@ while True:
         
         #print(sonar[0])
         i = int(sonar[0])
+        
+        angleDegres = (i*4)
+        
+        id_angle.append(canvas.create_text(100, 575, text = str(angleDegres), font=font, anchor="w"))
+        id_dist.append(canvas.create_text(570, 575, text = str(distance), font=font, anchor="w"))
+        canvas.delete(id_angle[idDstAng - 1])
+        canvas.delete(id_dist[idDstAng - 1])
+        idDstAng = idDstAng + 1
+        
+        
         i_rad = 2 * math.pi * (i*2) / 360
         rad = math.radians(i*4)
         x = math.cos(rad) * distance + 300
